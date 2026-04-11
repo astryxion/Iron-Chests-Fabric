@@ -4,13 +4,14 @@ import astryxion.ironchest.IronChests;
 import astryxion.ironchest.blocks.ChestTypes;
 import astryxion.ironchest.blocks.CrystalChestBlock;
 import astryxion.ironchest.blocks.GenericChestBlock;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.Identifier;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.Block;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.util.Identifier;
+
 public class ModBlocks {
     public static final Block COPPER_CHEST = new GenericChestBlock(settings("copper_chest", ChestTypes.COPPER), ChestTypes.COPPER);
     public static final Block IRON_CHEST = new GenericChestBlock(settings("iron_chest", ChestTypes.IRON), ChestTypes.IRON);
@@ -23,18 +24,18 @@ public class ModBlocks {
     public static final Block CHRISTMAS_CHEST = new GenericChestBlock(settings("christmas_chest", ChestTypes.CHRISTMAS), ChestTypes.CHRISTMAS);
 
     public static void registerBlocks() {
-        Registry.register(BuiltInRegistries.BLOCK, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "copper_chest"), COPPER_CHEST);
-        Registry.register(BuiltInRegistries.BLOCK, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "iron_chest"), IRON_CHEST);
-        Registry.register(BuiltInRegistries.BLOCK, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "gold_chest"), GOLD_CHEST);
-        Registry.register(BuiltInRegistries.BLOCK, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "diamond_chest"), DIAMOND_CHEST);
-        Registry.register(BuiltInRegistries.BLOCK, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "emerald_chest"), EMERALD_CHEST);
-        Registry.register(BuiltInRegistries.BLOCK, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "crystal_chest"), CRYSTAL_CHEST);
-        Registry.register(BuiltInRegistries.BLOCK, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "obsidian_chest"), OBSIDIAN_CHEST);
-        Registry.register(BuiltInRegistries.BLOCK, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "netherite_chest"), NETHERITE_CHEST);
-        Registry.register(BuiltInRegistries.BLOCK, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "christmas_chest"), CHRISTMAS_CHEST);
+        Registry.register(Registries.BLOCK, Identifier.of(IronChests.MOD_ID, "copper_chest"), COPPER_CHEST);
+        Registry.register(Registries.BLOCK, Identifier.of(IronChests.MOD_ID, "iron_chest"), IRON_CHEST);
+        Registry.register(Registries.BLOCK, Identifier.of(IronChests.MOD_ID, "gold_chest"), GOLD_CHEST);
+        Registry.register(Registries.BLOCK, Identifier.of(IronChests.MOD_ID, "diamond_chest"), DIAMOND_CHEST);
+        Registry.register(Registries.BLOCK, Identifier.of(IronChests.MOD_ID, "emerald_chest"), EMERALD_CHEST);
+        Registry.register(Registries.BLOCK, Identifier.of(IronChests.MOD_ID, "crystal_chest"), CRYSTAL_CHEST);
+        Registry.register(Registries.BLOCK, Identifier.of(IronChests.MOD_ID, "obsidian_chest"), OBSIDIAN_CHEST);
+        Registry.register(Registries.BLOCK, Identifier.of(IronChests.MOD_ID, "netherite_chest"), NETHERITE_CHEST);
+        Registry.register(Registries.BLOCK, Identifier.of(IronChests.MOD_ID, "christmas_chest"), CHRISTMAS_CHEST);
     }
 
-    private static BlockBehaviour.Properties settings(String name, ChestTypes type) {
-        return type.setting().setId(ResourceKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, name)));
+    private static AbstractBlock.Settings settings(String name, ChestTypes type) {
+        return type.setting().registryKey(RegistryKey.of(RegistryKeys.BLOCK, Identifier.of(IronChests.MOD_ID, name)));
     }
 }

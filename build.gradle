@@ -1,7 +1,21 @@
 plugins {
-	id 'net.fabricmc.fabric-loom' version "${loom_version}"
+	id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
 	id 'maven-publish'
 }
+
+def libguiVersion = project.libgui_version
+def libguiSrcJar = file("${rootDir}/LibGui-${libguiVersion}.jar")
+def libguiMavenDir = file("${rootDir}/repo/io/github/cottonmc/LibGui/${libguiVersion}")
+def libguiMavenJar = file("${libguiMavenDir}/LibGui-${libguiVersion}.jar")
+if (!libguiSrcJar.exists()) {
+	throw new GradleException("Missing LibGUI bundle at ${libguiSrcJar} — place LibGui-${libguiVersion}.jar at the project root.")
+}
+libguiMavenDir.mkdirs()
+java.nio.file.Files.copy(
+	libguiSrcJar.toPath(),
+	libguiMavenJar.toPath(),
+	java.nio.file.StandardCopyOption.REPLACE_EXISTING
+)
 
 version = project.mod_version
 group = project.maven_group
@@ -11,26 +25,14 @@ base {
 }
 
 repositories {
-	// LibGui from GitHub release assets: https://github.com/CottonMC/LibGui/releases
-	exclusiveContent {
-		forRepository {
-			ivy {
-				name = 'LibGui GitHub releases'
-				url = uri("https://github.com/CottonMC/LibGui/releases/download/${project.libgui_github_release_tag}/")
-				patternLayout {
-					artifact('LibGui-[revision].jar')
-				}
-				metadataSources {
-					artifact()
-				}
-			}
-		}
-		filter {
-			includeModule('io.github.cottonmc', 'LibGui')
-		}
+	maven {
+		name = "LibGuiLocal"
+		url = uri("${rootDir}/repo")
 	}
-	mavenLocal()
-	mavenCentral()
+	maven {
+		name = "CottonMC"
+		url = "https://server.bbkr.space/artifactory/libs-release"
+	}
 }
 
 loom {
@@ -42,14 +44,18 @@ loom {
 			sourceSet sourceSets.client
 		}
 	}
+
 }
 
 dependencies {
+	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
-	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	implementation "io.github.cottonmc:LibGui:${project.libgui_version}"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+	modImplementation "io.github.cottonmc:LibGui:${project.libgui_version}"
 	include "io.github.cottonmc:LibGui:${project.libgui_version}"
 }
 
@@ -62,13 +68,17 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 25
+	it.options.release = 21
 }
 
 java {
+	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+	// if it is present.
+	// If you remove this line, sources will not be generated.
 	withSourcesJar()
-	sourceCompatibility = JavaVersion.VERSION_25
-	targetCompatibility = JavaVersion.VERSION_25
+
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
 }
 
 jar {
@@ -79,6 +89,7 @@ jar {
 	}
 }
 
+// configure the maven publication
 publishing {
 	publications {
 		create("mavenJava", MavenPublication) {
@@ -87,6 +98,11 @@ publishing {
 		}
 	}
 
+	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
 	repositories {
+		// Add repositories to publish to here.
+		// Notice: This block does NOT have the same function as the block in the top level.
+		// The repositories here will be used for publishing your artifact, not for
+		// retrieving dependencies.
 	}
 }

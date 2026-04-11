@@ -1,10 +1,10 @@
 package astryxion.ironchest.blocks.blockentities;
 
 import astryxion.ironchest.blocks.ChestTypes;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.NonNullList;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.block.BlockState;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.math.BlockPos;
 
 public class CrystalChestEntity extends GenericChestEntity {
 
@@ -12,17 +12,13 @@ public class CrystalChestEntity extends GenericChestEntity {
         super(ChestTypes.CRYSTAL, pos, state);
     }
 
-    public NonNullList<ItemStack> getTopStacks() {
-        NonNullList<ItemStack> topStacks = NonNullList.withSize(12, ItemStack.EMPTY);
+    public DefaultedList<ItemStack> getTopStacks() {
+        DefaultedList<ItemStack> topStacks = DefaultedList.ofSize(12, ItemStack.EMPTY);
         int itemCount = 0;
-        for (ItemStack stack : getItems()) {
-            if (stack.isEmpty()) {
-                continue;
-            }
+        for (ItemStack stack : getHeldStacks()) {
+            if (stack.isEmpty()) continue;
             topStacks.set(itemCount++, stack);
-            if (itemCount >= 12) {
-                break;
-            }
+            if (itemCount >= 12) break;
         }
         return topStacks;
     }

@@ -2,72 +2,70 @@ package astryxion.ironchest.client;
 
 import astryxion.ironchest.blocks.GenericChestBlock;
 import astryxion.ironchest.blocks.blockentities.CrystalChestEntity;
-import astryxion.ironchest.blocks.blockentities.GenericChestEntity;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.geom.ModelLayers;
-import net.minecraft.client.model.object.chest.ChestModel;
-import net.minecraft.client.renderer.Sheets;
-import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.blockentity.ChestRenderer;
-import net.minecraft.client.renderer.blockentity.state.ChestRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.item.ItemModelResolver;
-import net.minecraft.client.renderer.item.ItemStackRenderState;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.sprite.SpriteGetter;
-import net.minecraft.client.resources.model.sprite.SpriteId;
-import net.minecraft.core.Direction;
-import net.minecraft.core.NonNullList;
-import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.ChestBlock;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.ChestType;
-import net.minecraft.world.level.block.entity.ChestBlockEntity;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.block.*;
+import net.minecraft.block.entity.ChestBlockEntity;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.model.ModelPart;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.TexturedRenderLayers;
+import net.minecraft.client.render.OverlayTexture;
+import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.render.block.entity.ChestBlockEntityRenderer;
+import net.minecraft.client.render.block.entity.state.ChestBlockEntityRenderState;
+import net.minecraft.client.render.command.ModelCommandRenderer;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.entity.model.EntityModelLayers;
+import net.minecraft.client.render.item.ItemRenderState;
+import net.minecraft.client.render.state.CameraRenderState;
+import net.minecraft.client.util.SpriteIdentifier;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.texture.Sprite;
+import net.minecraft.client.texture.SpriteHolder;
+import net.minecraft.item.ItemDisplayContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.RotationAxis;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 @Environment(EnvType.CLIENT)
-public class ChestEntityRenderer<T extends ChestBlockEntity> extends ChestRenderer<T> {
-    private final SpriteGetter spriteGetter;
-    private final ItemModelResolver itemModelResolver;
+public class ChestEntityRenderer<T extends ChestBlockEntity> extends ChestBlockEntityRenderer<T> {
+    private final SpriteHolder spriteHolder;
+
     private final ChestModel chestModel;
 
-    public ChestEntityRenderer(BlockEntityRendererProvider.Context context) {
+    public ChestEntityRenderer(BlockEntityRendererFactory.Context context) {
         super(context);
-        this.spriteGetter = context.sprites();
-        this.itemModelResolver = context.itemModelResolver();
-        this.chestModel = new ChestModel(context.bakeLayer(ModelLayers.CHEST));
+        this.spriteHolder = context.spriteHolder();
+
+        ModelPart modelPart = context.getLayerModelPart(EntityModelLayers.CHEST);
+        this.chestModel = new ChestModel(modelPart);
     }
 
     @Override
-    public ChestRenderState createRenderState() {
+    public ChestBlockEntityRenderState createRenderState() {
         return new GenericChestRenderState();
     }
 
     @Override
-    public void extractRenderState(T entity, ChestRenderState state, float tickDelta, Vec3 cameraPos, ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
-        super.extractRenderState(entity, state, tickDelta, cameraPos, crumblingOverlay);
-        GenericChestRenderState renderState = (GenericChestRenderState) state;
-        if (entity instanceof GenericChestEntity chest) {
-            state.open = chest.getOpenNess(tickDelta);
+    public void updateRenderState(T entity, ChestBlockEntityRenderState state, float tickDelta, Vec3d cameraPos, ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay) {
+        super.updateRenderState(entity, state, tickDelta, cameraPos, crumblingOverlay);
+        if (entity instanceof astryxion.ironchest.blocks.blockentities.GenericChestEntity chest) {
+            state.lidAnimationProgress = chest.getAnimationProgress(tickDelta);
         }
-        BlockState blockState = entity.getLevel() != null
-            ? entity.getBlockState()
-            : Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, Direction.SOUTH).setValue(ChestBlock.TYPE, ChestType.SINGLE);
-        renderState.blockStateForSubmit = blockState;
-        if (blockState.getBlock() instanceof GenericChestBlock chest) {
-            renderState.customSpriteId = new SpriteId(Sheets.CHEST_SHEET, chest.getType().texture);
+        GenericChestRenderState renderState = (GenericChestRenderState) state;
+        BlockState blockState = entity.getWorld() != null
+            ? entity.getCachedState()
+            : Blocks.CHEST.getDefaultState().with(ChestBlock.FACING, Direction.SOUTH);
+        Block block = blockState.getBlock();
+        if (block instanceof GenericChestBlock chest) {
+            renderState.textureId = new SpriteIdentifier(TexturedRenderLayers.CHEST_ATLAS_TEXTURE, chest.getType().texture);
         } else {
-            renderState.customSpriteId = Sheets.chooseSprite(state.material, state.type);
+            renderState.textureId = TexturedRenderLayers.getChestTextureId(state.variant, state.chestType);
         }
         if (entity instanceof CrystalChestEntity crystal) {
             renderState.topStacks = crystal.getTopStacks();
@@ -76,91 +74,113 @@ public class ChestEntityRenderer<T extends ChestBlockEntity> extends ChestRender
             renderState.topStacks = null;
             renderState.renderItems = false;
         }
-        renderState.itemRenderSeed = (int) entity.getBlockPos().asLong();
+        renderState.seed = (int) entity.getPos().asLong();
     }
 
     @Override
-    public void submit(ChestRenderState state, PoseStack poseStack, SubmitNodeCollector queue, CameraRenderState cameraRenderState) {
-        if (!(state instanceof GenericChestRenderState renderState) || !(renderState.blockStateForSubmit.getBlock() instanceof GenericChestBlock)) {
-            super.submit(state, poseStack, queue, cameraRenderState);
+    public void render(ChestBlockEntityRenderState state, MatrixStack matrices, OrderedRenderCommandQueue queue, CameraRenderState cameraRenderState) {
+        if (!(state.blockState.getBlock() instanceof GenericChestBlock)) {
+            super.render(state, matrices, queue, cameraRenderState);
             return;
         }
 
-        SpriteId spriteId = renderState.customSpriteId;
+        GenericChestRenderState renderState = (GenericChestRenderState) state;
+        SpriteIdentifier spriteIdentifier = renderState.textureId;
+        RenderLayer renderLayer = spriteIdentifier.getRenderLayer(id -> TexturedRenderLayers.getChest());
+        Sprite sprite = this.spriteHolder.getSprite(spriteIdentifier);
 
-        poseStack.pushPose();
-        poseStack.translate(0.5F, 0.5F, 0.5F);
-        poseStack.mulPose(Axis.YP.rotationDegrees(-state.facing.toYRot()));
-        poseStack.translate(-0.5F, -0.5F, -0.5F);
+        matrices.push();
+        matrices.translate(0.5F, 0.5F, 0.5F);
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-state.yaw));
+        matrices.translate(-0.5F, -0.5F, -0.5F);
 
-        // 1.21.11 ChestEntityRenderer order: chest model first, then floating items (same OrderedRenderCommandQueue usage).
         queue.submitModel(
             this.chestModel,
-            state.open,
-            poseStack,
-            state.lightCoords,
-            OverlayTexture.NO_OVERLAY,
+            state,
+            matrices,
+            renderLayer,
+            state.lightmapCoordinates,
+            OverlayTexture.DEFAULT_UV,
             -1,
-            spriteId,
-            this.spriteGetter,
+            sprite,
             0,
-            state.breakProgress
+            state.crumblingOverlay
         );
 
         if (renderState.renderItems && renderState.topStacks != null) {
-            renderItems(poseStack, renderState.topStacks, queue, state.lightCoords, renderState.itemRenderSeed);
+            renderItems(matrices, renderState.topStacks, queue, state.lightmapCoordinates, renderState.seed);
         }
 
-        poseStack.popPose();
+        matrices.pop();
     }
 
-    private void renderItems(PoseStack poseStack, NonNullList<ItemStack> inv, SubmitNodeCollector queue, int light, int seed) {
+    private void renderItems(MatrixStack matrices, DefaultedList<ItemStack> inv, OrderedRenderCommandQueue queue, int light, int seed) {
         int counter = 0;
         for (int j = 0; j < 3; j++) {
-            renderItem(0.55, 0.3 + (j * 0.5), 0.7, inv, counter, poseStack, queue, light, seed);
+            renderItem(0.55, 0.3 + (j * 0.5), 0.7, inv, counter, matrices, queue, light, seed);
             counter++;
         }
         for (int j = 0; j < 3; j++) {
-            renderItem(1.4, 0.3 + (j * 0.5), 0.7, inv, counter, poseStack, queue, light, seed);
+            renderItem(1.4, 0.3 + (j * 0.5), 0.7, inv, counter, matrices, queue, light, seed);
             counter++;
         }
         for (int j = 0; j < 3; j++) {
-            renderItem(0.55, 0.3 + (j * 0.5), 1.4, inv, counter, poseStack, queue, light, seed);
+            renderItem(0.55, 0.3 + (j * 0.5), 1.4, inv, counter, matrices, queue, light, seed);
             counter++;
         }
         for (int j = 0; j < 3; j++) {
-            renderItem(1.4, 0.3 + (j * 0.5), 1.4, inv, counter, poseStack, queue, light, seed);
+            renderItem(1.4, 0.3 + (j * 0.5), 1.4, inv, counter, matrices, queue, light, seed);
             counter++;
         }
     }
 
-    private void renderItem(double x, double y, double z, NonNullList<ItemStack> inv, int counter, PoseStack poseStack, SubmitNodeCollector queue, int light, int seed) {
-        poseStack.pushPose();
+    private void renderItem(double x, double y, double z, DefaultedList<ItemStack> inv, int counter, MatrixStack matrices, OrderedRenderCommandQueue queue, int light, int seed) {
+        matrices.push();
         ItemStack item = inv.get(counter);
         if (item.isEmpty()) {
-            poseStack.popPose();
+            matrices.pop();
             return;
         }
-        poseStack.scale(0.5f, 0.5f, 0.5f);
-        poseStack.translate(x, y, z);
-        Level level = Minecraft.getInstance().level;
-        float tickDelta = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaTicks();
-        long time = level != null ? level.getGameTime() : 0L;
-        poseStack.mulPose(Axis.YP.rotationDegrees(time + tickDelta));
-        if (level != null) {
-            ItemStackRenderState itemRenderState = new ItemStackRenderState();
-            itemModelResolver.updateForTopItem(itemRenderState, item, ItemDisplayContext.GROUND, level, null, seed);
-            itemRenderState.submit(poseStack, queue, light, OverlayTexture.NO_OVERLAY, 0);
+        matrices.scale(0.5f, 0.5f, 0.5f);
+        matrices.translate(x, y, z);
+        World world = MinecraftClient.getInstance().world;
+        float tickDelta = MinecraftClient.getInstance().getRenderTickCounter().getDynamicDeltaTicks();
+        long time = world != null ? world.getTime() : 0L;
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(time + tickDelta));
+        if (world != null) {
+            ItemRenderState itemRenderState = new ItemRenderState();
+            MinecraftClient.getInstance().getItemModelManager().clearAndUpdate(itemRenderState, item, ItemDisplayContext.GROUND, world, null, seed);
+            itemRenderState.render(matrices, queue, light, OverlayTexture.DEFAULT_UV, 0);
         }
-        poseStack.popPose();
+        matrices.pop();
     }
 
-    private static final class GenericChestRenderState extends ChestRenderState {
-        private BlockState blockStateForSubmit;
-        private SpriteId customSpriteId;
+
+    private static final class GenericChestRenderState extends ChestBlockEntityRenderState {
+        private SpriteIdentifier textureId;
         private boolean renderItems;
-        private int itemRenderSeed;
+        private int seed;
         @Nullable
-        private NonNullList<ItemStack> topStacks;
+        private DefaultedList<ItemStack> topStacks;
+    }
+
+    private static final class ChestModel extends net.minecraft.client.model.Model<ChestBlockEntityRenderState> {
+        private final ModelPart lid;
+        private final ModelPart lock;
+
+        private ChestModel(ModelPart root) {
+            super(root, id -> TexturedRenderLayers.getChest());
+            this.lid = root.getChild("lid");
+            this.lock = root.getChild("lock");
+        }
+
+        @Override
+        public void setAngles(ChestBlockEntityRenderState state) {
+            this.resetTransforms();
+            float openFactor = 1.0F - state.lidAnimationProgress;
+            openFactor = 1.0F - openFactor * openFactor * openFactor;
+            this.lid.pitch = -openFactor * 1.5707964F;
+            this.lock.pitch = this.lid.pitch;
+        }
     }
 }

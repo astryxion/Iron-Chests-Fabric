@@ -5,10 +5,9 @@ import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
 import io.github.cottonmc.cotton.gui.widget.WItemSlot;
 import io.github.cottonmc.cotton.gui.widget.WPanel;
 import io.github.cottonmc.cotton.gui.widget.WWidget;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public final class SlotBackgrounds {
-    private static final BackgroundPainter VANILLA_SLOT = (GuiGraphicsExtractor context, int left, int top, WWidget panel) -> {
+    private static final BackgroundPainter VANILLA_SLOT = (context, left, top, panel) -> {
         if (!(panel instanceof WItemSlot slot)) {
             return;
         }

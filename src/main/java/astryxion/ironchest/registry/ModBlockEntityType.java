@@ -4,10 +4,10 @@ package astryxion.ironchest.registry;
 import astryxion.ironchest.IronChests;
 import astryxion.ironchest.blocks.blockentities.*;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.util.Identifier;
 
 
 public class ModBlockEntityType {
@@ -25,14 +25,14 @@ public class ModBlockEntityType {
 
     public static void registerBlockEntities() {
         // Registering Chest Block Entities
-        Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "copper_chest"), COPPER_CHEST);
-        Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "iron_chest"), IRON_CHEST);
-        Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "gold_chest"), GOLD_CHEST);
-        Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "diamond_chest"), DIAMOND_CHEST);
-        Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "emerald_chest"), EMERALD_CHEST);
-        Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "crystal_chest"), CRYSTAL_CHEST);
-        Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "obsidian_chest"), OBSIDIAN_CHEST);
-        Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "netherite_chest"), NETHERITE_CHEST);
-        Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "christmas_chest"), CHRISTMAS_CHEST);
+        Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(IronChests.MOD_ID, "copper_chest"), COPPER_CHEST);
+        Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(IronChests.MOD_ID, "iron_chest"), IRON_CHEST);
+        Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(IronChests.MOD_ID, "gold_chest"), GOLD_CHEST);
+        Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(IronChests.MOD_ID, "diamond_chest"), DIAMOND_CHEST);
+        Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(IronChests.MOD_ID, "emerald_chest"), EMERALD_CHEST);
+        Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(IronChests.MOD_ID, "crystal_chest"), CRYSTAL_CHEST);
+        Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(IronChests.MOD_ID, "obsidian_chest"), OBSIDIAN_CHEST);
+        Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(IronChests.MOD_ID, "netherite_chest"), NETHERITE_CHEST);
+        Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of(IronChests.MOD_ID, "christmas_chest"), CHRISTMAS_CHEST);
     }
 }

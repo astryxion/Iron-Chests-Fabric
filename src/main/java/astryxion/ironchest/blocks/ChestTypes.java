@@ -5,28 +5,28 @@ import astryxion.ironchest.registry.ModBlockEntityType;
 import astryxion.ironchest.registry.ModBlocks;
 import astryxion.ironchest.registry.ModScreenHandlerType;
 import astryxion.ironchest.screenhandlers.ChestScreenHandler;
-import net.minecraft.core.BlockPos;
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.entity.ChestBlockEntity;
-import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.block.entity.ChestBlockEntity;
+import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 
 public enum ChestTypes {
-    NETHERITE(126, 14, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/netherite_chest")),
-    OBSIDIAN(108, 12, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/obsidian_chest")),
-    CRYSTAL(108, 12, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/crystal_chest")),
-    DIAMOND(108, 12, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/diamond_chest")),
-    EMERALD(108, 12, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/emerald_chest")),
-    GOLD(81, 9, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/gold_chest")),
-    IRON(54, 9, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/iron_chest")),
-    COPPER(45, 9, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/copper_chest")),
-    CHRISTMAS(27, 9, Identifier.parse("minecraft:entity/chest/christmas")),
-    WOOD(27, 9, Identifier.parse("minecraft:entity/chest/normal"));
+    NETHERITE(126, 14, Identifier.of(IronChests.MOD_ID, "entity/chest/netherite_chest")),
+    OBSIDIAN(108, 12, Identifier.of(IronChests.MOD_ID, "entity/chest/obsidian_chest")),
+    CRYSTAL(108, 12, Identifier.of(IronChests.MOD_ID, "entity/chest/crystal_chest")),
+    DIAMOND(108, 12, Identifier.of(IronChests.MOD_ID, "entity/chest/diamond_chest")),
+    EMERALD(108, 12, Identifier.of(IronChests.MOD_ID, "entity/chest/emerald_chest")),
+    GOLD(81, 9, Identifier.of(IronChests.MOD_ID, "entity/chest/gold_chest")),
+    IRON(54, 9, Identifier.of(IronChests.MOD_ID, "entity/chest/iron_chest")),
+    COPPER(45, 9, Identifier.of(IronChests.MOD_ID, "entity/chest/copper_chest")),
+    CHRISTMAS(27, 9, Identifier.of("entity/chest/christmas")),
+    WOOD(27, 9, Identifier.of("entity/chest/normal"));
 
     public final int size;
     public final int rowLength;
@@ -60,20 +60,20 @@ public enum ChestTypes {
     // Used to implement Item Upgrades
     public ChestBlockEntity makeEntity(BlockPos pos, BlockState state) {
         return switch (this) {
-            case COPPER -> ModBlockEntityType.COPPER_CHEST.create(pos, state);
-            case IRON -> ModBlockEntityType.IRON_CHEST.create(pos, state);
-            case GOLD -> ModBlockEntityType.GOLD_CHEST.create(pos, state);
-            case DIAMOND -> ModBlockEntityType.DIAMOND_CHEST.create(pos, state);
-            case EMERALD -> ModBlockEntityType.EMERALD_CHEST.create(pos, state);
-            case CRYSTAL -> ModBlockEntityType.CRYSTAL_CHEST.create(pos, state);
-            case OBSIDIAN -> ModBlockEntityType.OBSIDIAN_CHEST.create(pos, state);
-            case NETHERITE -> ModBlockEntityType.NETHERITE_CHEST.create(pos, state);
-            case CHRISTMAS -> ModBlockEntityType.CHRISTMAS_CHEST.create(pos, state);
+            case COPPER -> ModBlockEntityType.COPPER_CHEST.instantiate(pos, state);
+            case IRON -> ModBlockEntityType.IRON_CHEST.instantiate(pos, state);
+            case GOLD -> ModBlockEntityType.GOLD_CHEST.instantiate(pos, state);
+            case DIAMOND -> ModBlockEntityType.DIAMOND_CHEST.instantiate(pos, state);
+            case EMERALD -> ModBlockEntityType.EMERALD_CHEST.instantiate(pos, state);
+            case CRYSTAL -> ModBlockEntityType.CRYSTAL_CHEST.instantiate(pos, state);
+            case OBSIDIAN -> ModBlockEntityType.OBSIDIAN_CHEST.instantiate(pos, state);
+            case NETHERITE -> ModBlockEntityType.NETHERITE_CHEST.instantiate(pos, state);
+            case CHRISTMAS -> ModBlockEntityType.CHRISTMAS_CHEST.instantiate(pos, state);
             default -> new ChestBlockEntity(pos, state);
         };
     }
 
-    public MenuType<ChestScreenHandler> getScreenHandlerType() {
+    public ScreenHandlerType<ChestScreenHandler> getScreenHandlerType() {
         return switch (this) {
             case COPPER -> ModScreenHandlerType.COPPER_CHEST;
             case IRON -> ModScreenHandlerType.IRON_CHEST;
@@ -102,36 +102,43 @@ public enum ChestTypes {
         };
     }
 
-    public BlockBehaviour.Properties setting() {
+    public AbstractBlock.Settings setting() {
         return switch (this) {
-            case COPPER, GOLD -> BlockBehaviour.Properties.of()
-                    .strength(3.0F, 6.0F)
-                    .sound(SoundType.COPPER)
-                    .requiresCorrectToolForDrops();
-            case IRON -> BlockBehaviour.Properties.of()
-                    .strength(5.0F, 6.0F)
-                    .sound(SoundType.IRON)
-                    .requiresCorrectToolForDrops();
-            case DIAMOND, EMERALD -> BlockBehaviour.Properties.of()
-                    .strength(5.0F, 6.0F)
-                    .sound(SoundType.STONE)
-                    .requiresCorrectToolForDrops();
-            case CRYSTAL -> BlockBehaviour.Properties.of()
-                    .strength(3.0F, 3.0F)
-                    .sound(SoundType.AMETHYST)
-                    .requiresCorrectToolForDrops();
-            case OBSIDIAN -> BlockBehaviour.Properties.of()
-                    .strength(50.0F, 1200.0F)
-                    .sound(SoundType.STONE)
-                    .requiresCorrectToolForDrops();
-            case NETHERITE -> BlockBehaviour.Properties.of()
-                    .strength(50.0F, 1200.0F)
-                    .sound(SoundType.NETHERITE_BLOCK)
-                    .requiresCorrectToolForDrops();
-            case WOOD, CHRISTMAS -> BlockBehaviour.Properties.of()
-                    .strength(3.0F, 3.0F)
-                    .sound(SoundType.WOOD);
-            default -> BlockBehaviour.Properties.of();
+            case COPPER, GOLD -> AbstractBlock.Settings.create()
+                    .hardness(3.0F)
+                    .resistance(6.0F)
+                    .sounds(BlockSoundGroup.COPPER)
+                    .requiresTool();
+            case IRON -> AbstractBlock.Settings.create()
+                    .hardness(5.0F)
+                    .resistance(6.0F)
+                    .sounds(BlockSoundGroup.IRON)
+                    .requiresTool();
+            case DIAMOND, EMERALD -> AbstractBlock.Settings.create()
+                    .hardness(5.0F)
+                    .resistance(6.0F)
+                    .sounds(BlockSoundGroup.STONE)
+                    .requiresTool();
+            case CRYSTAL -> AbstractBlock.Settings.create()
+                    .hardness(3.0F)
+                    .resistance(3.0F)
+                    .sounds(BlockSoundGroup.AMETHYST_BLOCK)
+                    .requiresTool();
+            case OBSIDIAN -> AbstractBlock.Settings.create()
+                    .hardness(50.0F)
+                    .resistance(1200.0F)
+                    .sounds(BlockSoundGroup.STONE)
+                    .requiresTool();
+            case NETHERITE -> AbstractBlock.Settings.create()
+                    .hardness(50.0F)
+                    .resistance(1200.0F)
+                    .sounds(BlockSoundGroup.NETHERITE)
+                    .requiresTool();
+            case WOOD, CHRISTMAS -> AbstractBlock.Settings.create()
+                    .hardness(3.0F)
+                    .resistance(3.0F)
+                    .sounds(BlockSoundGroup.WOOD);
+            default -> AbstractBlock.Settings.create();
         };
     }
 }

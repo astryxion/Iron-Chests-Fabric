@@ -1,18 +1,17 @@
 package astryxion.ironchest.registry;
 
 import astryxion.ironchest.IronChests;
-import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.ItemStack;
+import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.text.Text;
 
 public class ModItemGroup {
     public static void registerItemGroup() {
-        Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, IronChests.TAB, FabricCreativeModeTab.builder()
+        Registry.register(Registries.ITEM_GROUP, IronChests.TAB, FabricItemGroup.builder()
             .icon(() -> new ItemStack(ModBlocks.IRON_CHEST))
-            .title(Component.translatable("itemGroup.ironchest.general"))
+            .displayName(Text.translatable("itemGroup.ironchest.general"))
             .build());
     }
 }
