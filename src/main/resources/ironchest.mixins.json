@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "astryxion.ironchest.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "ChestBlockEntityViewerCountMixin",
+    "PlayerEntityViewingMixin"
+  ],
+  "client": [
+    "ChestModelRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

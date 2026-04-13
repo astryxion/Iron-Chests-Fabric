@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "iii",
+    "iCi",
+    "iii"
+  ],
+  "key": {
+    "i": "minecraft:copper_block",
+    "C": "minecraft:chest"
+  },
+  "result": {
+    "id": "ironchest:copper_chest",
+    "count": 1
+  }
+}

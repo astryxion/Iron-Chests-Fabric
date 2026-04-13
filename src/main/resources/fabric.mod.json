@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "ironchest",
+  "version": "${version}",
+  "name": "Iron Chests",
+  "description": "Bigger Chests for Minecraft",
+  "authors": [
+    "astryxion"
+  ],
+  "contact": {
+    "homepage": "https://github.com/astryxion23/Iron-Chests-Fabric",
+    "sources": "https://github.com/astryxion23/Iron-Chests-Fabric"
+  },
+  "license": "gpl-3.0",
+  "icon": "assets/ironchest/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "astryxion.ironchest.IronChests"
+    ],
+    "client": [
+      "astryxion.ironchest.IronChestsClient"
+    ]
+  },
+  "mixins": [
+    "ironchest.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.18.2",
+    "fabric-api": "*",
+    "minecraft": "~1.21.10",
+    "java": ">=21"
+  }
+}
