@@ -1,10 +1,17 @@
 package astryxion.ironchest.blocks.blockentities;
 
 import astryxion.ironchest.blocks.ChestTypes;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
 
 public class CrystalChestEntity extends GenericChestEntity {
 
@@ -12,14 +19,37 @@ public class CrystalChestEntity extends GenericChestEntity {
         super(ChestTypes.CRYSTAL, pos, state);
     }
 
-    public DefaultedList<ItemStack> getTopStacks() {
-        DefaultedList<ItemStack> topStacks = DefaultedList.ofSize(12, ItemStack.EMPTY);
+    public NonNullList<ItemStack> getTopStacks() {
+        NonNullList<ItemStack> topStacks = NonNullList.withSize(12, ItemStack.EMPTY);
         int itemCount = 0;
-        for (ItemStack stack : getHeldStacks()) {
-            if (stack.isEmpty()) continue;
-            topStacks.set(itemCount++, stack);
-            if (itemCount >= 12) break;
+        for (ItemStack stack : this.getItems()) {
+            if (stack.isEmpty()) {
+                continue;
+            }
+            topStacks.set(itemCount++, stack.copy());
+            if (itemCount >= 12) {
+                break;
+            }
         }
         return topStacks;
+    }
+
+    @Override
+    public void setChanged() {
+        super.setChanged();
+        if (this.level instanceof ServerLevel serverLevel) {
+            serverLevel.getChunkSource().blockChanged(this.worldPosition);
+        }
+    }
+
+    @Nullable
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return this.saveWithoutMetadata(registries);
     }
 }

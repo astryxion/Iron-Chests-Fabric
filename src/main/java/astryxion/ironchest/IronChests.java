@@ -1,22 +1,27 @@
 package astryxion.ironchest;
 
-import astryxion.ironchest.registry.*;
+import astryxion.ironchest.registry.ModBlockEntityType;
+import astryxion.ironchest.registry.ModBlocks;
+import astryxion.ironchest.registry.ModItemGroup;
+import astryxion.ironchest.registry.ModItems;
+import astryxion.ironchest.registry.ModScreenHandlerType;
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.CreativeModeTab;
 
 public class IronChests implements ModInitializer {
-
     public static final String MOD_ID = "ironchest";
-    public static final RegistryKey<ItemGroup> TAB = RegistryKey.of(RegistryKeys.ITEM_GROUP, Identifier.of(MOD_ID, "general"));
+    public static final ResourceKey<CreativeModeTab> TAB = ResourceKey.create(
+        Registries.CREATIVE_MODE_TAB,
+        ResourceLocation.fromNamespaceAndPath(MOD_ID, "general")
+    );
 
     @Override
     public void onInitialize() {
-        ModItems.registerItems();
         ModBlocks.registerBlocks();
+        ModItems.registerItems();
         ModItemGroup.registerItemGroup();
         ModBlockEntityType.registerBlockEntities();
         ModScreenHandlerType.registerScreenHandlers();
