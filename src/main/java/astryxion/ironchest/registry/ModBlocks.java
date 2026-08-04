@@ -7,7 +7,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 
@@ -42,7 +42,7 @@ public class ModBlocks {
         for (ChestTypes type : ChestTypes.PLAYABLE) {
             Registry.register(
                 BuiltInRegistries.BLOCK,
-                ResourceLocation.fromNamespaceAndPath(IronChests.MOD_ID, type.registryId),
+                Identifier.fromNamespaceAndPath(IronChests.MOD_ID, type.registryId),
                 type.getBlock()
             );
         }
@@ -50,6 +50,6 @@ public class ModBlocks {
 
     private static BlockBehaviour.Properties blockProperties(ChestTypes type) {
         return type.blockProperties()
-            .setId(ResourceKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(IronChests.MOD_ID, type.registryId)));
+            .setId(ResourceKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, type.registryId)));
     }
 }

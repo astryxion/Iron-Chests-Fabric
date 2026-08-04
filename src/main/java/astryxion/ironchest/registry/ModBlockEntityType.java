@@ -7,7 +7,7 @@ import astryxion.ironchest.blocks.blockentities.GenericChestEntity;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 
@@ -47,7 +47,7 @@ public class ModBlockEntityType {
         for (ChestTypes type : ChestTypes.PLAYABLE) {
             Registry.register(
                 BuiltInRegistries.BLOCK_ENTITY_TYPE,
-                ResourceLocation.fromNamespaceAndPath(IronChests.MOD_ID, type.registryId),
+                Identifier.fromNamespaceAndPath(IronChests.MOD_ID, type.registryId),
                 type.getBlockEntityType()
             );
         }

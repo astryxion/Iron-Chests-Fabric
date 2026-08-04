@@ -5,7 +5,7 @@ import astryxion.ironchest.blocks.blockentities.CrystalChestEntity;
 import astryxion.ironchest.blocks.blockentities.GenericChestEntity;
 import astryxion.ironchest.screenhandlers.ChestScreenHandler;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -14,19 +14,19 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.inventory.MenuType;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public enum ChestTypes {
-    NETHERITE(126, 14, "netherite_chest", ResourceLocation.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/netherite_chest")),
-    OBSIDIAN(108, 12, "obsidian_chest", ResourceLocation.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/obsidian_chest")),
-    CRYSTAL(108, 12, "crystal_chest", ResourceLocation.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/crystal_chest")),
-    DIAMOND(108, 12, "diamond_chest", ResourceLocation.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/diamond_chest")),
-    EMERALD(108, 12, "emerald_chest", ResourceLocation.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/emerald_chest")),
-    GOLD(81, 9, "gold_chest", ResourceLocation.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/gold_chest")),
-    IRON(54, 9, "iron_chest", ResourceLocation.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/iron_chest")),
-    COPPER(45, 9, "copper_chest", ResourceLocation.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/copper_chest")),
-    CHRISTMAS(27, 9, "christmas_chest", ResourceLocation.withDefaultNamespace("entity/chest/christmas")),
-    WOOD(27, 9, null, ResourceLocation.withDefaultNamespace("entity/chest/normal"));
+    NETHERITE(126, 14, "netherite_chest", Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/netherite_chest")),
+    OBSIDIAN(108, 12, "obsidian_chest", Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/obsidian_chest")),
+    CRYSTAL(108, 12, "crystal_chest", Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/crystal_chest")),
+    DIAMOND(108, 12, "diamond_chest", Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/diamond_chest")),
+    EMERALD(108, 12, "emerald_chest", Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/emerald_chest")),
+    GOLD(81, 9, "gold_chest", Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/gold_chest")),
+    IRON(54, 9, "iron_chest", Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/iron_chest")),
+    COPPER(45, 9, "copper_chest", Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/copper_chest")),
+    CHRISTMAS(27, 9, "christmas_chest", Identifier.withDefaultNamespace("entity/chest/christmas")),
+    WOOD(27, 9, null, Identifier.withDefaultNamespace("entity/chest/normal"));
 
     public static final ChestTypes[] PLAYABLE = {
         COPPER, IRON, GOLD, DIAMOND, EMERALD, CRYSTAL, OBSIDIAN, NETHERITE, CHRISTMAS
@@ -35,13 +35,13 @@ public enum ChestTypes {
     public final int size;
     public final int rowLength;
     public final String registryId;
-    public final ResourceLocation texture;
+    public final Identifier texture;
 
     private @Nullable Block block;
     private @Nullable BlockEntityType<? extends ChestBlockEntity> blockEntityType;
     private MenuType<ChestScreenHandler> menuType;
 
-    ChestTypes(int size, int rowLength, String registryId, ResourceLocation texture) {
+    ChestTypes(int size, int rowLength, String registryId, Identifier texture) {
         this.size = size;
         this.rowLength = rowLength;
         this.registryId = registryId;

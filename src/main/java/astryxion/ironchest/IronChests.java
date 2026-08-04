@@ -8,14 +8,14 @@ import astryxion.ironchest.registry.ModScreenHandlerType;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
 
 public class IronChests implements ModInitializer {
     public static final String MOD_ID = "ironchest";
     public static final ResourceKey<CreativeModeTab> TAB = ResourceKey.create(
         Registries.CREATIVE_MODE_TAB,
-        ResourceLocation.fromNamespaceAndPath(MOD_ID, "general")
+        Identifier.fromNamespaceAndPath(MOD_ID, "general")
     );
 
     @Override

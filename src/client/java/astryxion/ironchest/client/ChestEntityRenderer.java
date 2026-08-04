@@ -9,8 +9,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelLayers;
-import net.minecraft.client.model.ChestModel;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.model.object.chest.ChestModel;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -18,6 +17,8 @@ import net.minecraft.client.renderer.blockentity.ChestRenderer;
 import net.minecraft.client.renderer.blockentity.state.ChestRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -31,7 +32,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.LidBlockEntity;
 import net.minecraft.world.level.block.state.properties.ChestType;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 @Environment(EnvType.CLIENT)
 public class ChestEntityRenderer<T extends BlockEntity & LidBlockEntity> extends ChestRenderer<T> {
@@ -88,7 +89,7 @@ public class ChestEntityRenderer<T extends BlockEntity & LidBlockEntity> extends
         open = 1.0F - open * open * open;
         ChestModel model = selectModel(state.type);
         Material material = renderState.modMaterial;
-        RenderType renderType = material.renderType(RenderType::entityCutout);
+        RenderType renderType = material.renderType(RenderTypes::entityCutout);
         TextureAtlasSprite sprite = this.materials.get(material);
         submitNodeCollector.submitModel(
             model,

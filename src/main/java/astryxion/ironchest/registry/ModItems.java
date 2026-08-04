@@ -11,7 +11,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.component.ItemLore;
@@ -70,7 +70,7 @@ public class ModItems {
 
     public static void registerItems() {
         ITEMS_BY_ID.forEach((id, item) ->
-            Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(IronChests.MOD_ID, id), item)
+            Registry.register(BuiltInRegistries.ITEM, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, id), item)
         );
 
         ItemGroupEvents.modifyEntriesEvent(IronChests.TAB).register(output -> {
@@ -119,7 +119,7 @@ public class ModItems {
     }
 
     private static Item.Properties settings(String name) {
-        return new Item.Properties().setId(ResourceKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(IronChests.MOD_ID, name)));
+        return new Item.Properties().setId(ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, name)));
     }
 
     private static Item.Properties blockItemSettings(String name) {

@@ -7,7 +7,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 
 public class ChestScreen extends AbstractContainerScreen<ChestScreenHandler> {
@@ -92,7 +92,7 @@ public class ChestScreen extends AbstractContainerScreen<ChestScreenHandler> {
         return xo + ChestGuiLayout.playerInventoryX(this.containerColumns) - ChestGuiLayout.LEFT_INSET;
     }
 
-    private static void blitWideStrip(GuiGraphics graphics, ResourceLocation texture, int x, int y, int width, int height) {
+    private static void blitWideStrip(GuiGraphics graphics, Identifier texture, int x, int y, int width, int height) {
         graphics.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, 0.0F, 0.0F, width, height, width, height);
     }
 
