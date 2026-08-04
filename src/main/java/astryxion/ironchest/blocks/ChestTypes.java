@@ -9,6 +9,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.BlockEntityTypes;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
@@ -80,7 +81,7 @@ public enum ChestTypes {
     }
 
     public BlockEntityType<? extends ChestBlockEntity> getBlockEntityType() {
-        return this.blockEntityType != null ? this.blockEntityType : BlockEntityType.CHEST;
+        return this.blockEntityType != null ? this.blockEntityType : BlockEntityTypes.CHEST;
     }
 
     public BlockBehaviour.Properties blockProperties() {
