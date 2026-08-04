@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "GeG",
+    "GCG",
+    "GGG"
+  ],
+  "key": {
+    "e": "minecraft:emerald",
+    "C": "ironchest:gold_chest",
+    "G": "minecraft:glass"
+  },
+  "result": {
+    "id": "ironchest:emerald_chest",
+    "count": 1
+  }
+}
