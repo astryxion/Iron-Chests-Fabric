@@ -1,11 +1,10 @@
 package astryxion.ironchest.items;
 
-import astryxion.ironchest.IronChests;
 import astryxion.ironchest.blocks.ChestTypes;
-import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
+import astryxion.ironchest.blocks.blockentities.GenericChestEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -14,30 +13,32 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ChestBlock;
-import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.LevelEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.TagValueInput;
-import net.minecraft.core.Direction;
 
 public class UpgradeItem extends Item {
+    private final UpgradeTypes type;
 
-    UpgradeTypes type;
-
-    public UpgradeItem(UpgradeTypes type, Item.Properties settings) {
-        super(settings);
-        CreativeModeTabEvents.modifyOutputEvent(IronChests.TAB).register(entries -> entries.accept(this));
+    public UpgradeItem(UpgradeTypes type, Properties properties) {
+        super(properties);
         this.type = type;
     }
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
-
         Level level = context.getLevel();
+        BlockPos blockPos = context.getClickedPos();
+        BlockState state = level.getBlockState(blockPos);
+
         if (level.isClientSide()) {
-            return InteractionResult.PASS;
+            return InteractionResult.SUCCESS;
         }
 
         Player player = context.getPlayer();
@@ -45,54 +46,59 @@ public class UpgradeItem extends Item {
             return InteractionResult.PASS;
         }
 
-        BlockPos blockPos = context.getClickedPos();
-        if (this.type.canUpgrade(ChestTypes.WOOD)) {
-            if (!(level.getBlockState(blockPos).getBlock() instanceof ChestBlock)) {
-                return InteractionResult.PASS;
-            }
-        } else {
-            if (level.getBlockState(blockPos).getBlock() != ChestTypes.get(this.type.source)) {
-                return InteractionResult.PASS;
-            }
+        if (!player.mayBuild()) {
+            return InteractionResult.PASS;
+        }
+
+        if (!canUpgrade(state)) {
+            return InteractionResult.PASS;
         }
 
         BlockEntity blockEntity = level.getBlockEntity(blockPos);
-
-        ItemStack itemStack = context.getItemInHand();
-        Direction chestFacing;
-
-        if (blockEntity != null) {
-            ChestBlockEntity chest = (ChestBlockEntity) blockEntity;
-
-            if (ChestBlockEntity.getOpenCount(level, blockPos) > 0) {
-                return InteractionResult.PASS;
-            }
-            if (!chest.stillValid(player)) {
-                return InteractionResult.PASS;
-            }
-
-            BlockState oldState = level.getBlockState(blockPos);
-            chestFacing = level.getBlockState(blockPos).getValue(ChestBlock.FACING);
-            level.removeBlockEntity(blockPos);
-            level.removeBlock(blockPos, false);
-            level.addDestroyBlockEffect(blockPos, oldState);
-
-            BlockState blockState = ChestTypes.get(type.target).defaultBlockState().setValue(ChestBlock.FACING, chestFacing).setValue(ChestBlock.WATERLOGGED, false);
-            CompoundTag oldChestTag = chest.saveWithoutMetadata(level.registryAccess());
-            level.setBlock(blockPos, blockState, 3);
-            level.setBlocksDirty(blockPos, blockState, blockState);
-            BlockEntity newBlockEntity = level.getBlockEntity(blockPos);
-            if (newBlockEntity != null) {
-                newBlockEntity.loadWithComponents(TagValueInput.create(ProblemReporter.DISCARDING, level.registryAccess(), oldChestTag));
-                newBlockEntity.setChanged();
-            }
-            SoundType oldSounds = oldState.getSoundType();
-            SoundType newSounds = blockState.getSoundType();
-            level.playSound(null, blockPos, oldSounds.getBreakSound(), SoundSource.BLOCKS, oldSounds.getVolume(), oldSounds.getPitch());
-            level.playSound(null, blockPos, newSounds.getPlaceSound(), SoundSource.BLOCKS, newSounds.getVolume(), newSounds.getPitch());
-            itemStack.shrink(1);
+        if (!(blockEntity instanceof ChestBlockEntity chest)) {
+            return InteractionResult.PASS;
         }
-        return InteractionResult.PASS;
+
+        if (ChestBlockEntity.getOpenCount(level, blockPos) > 0 || !chest.stillValid(player)) {
+            return InteractionResult.PASS;
+        }
+
+        BlockState oldState = state;
+        Direction chestFacing = oldState.getValue(ChestBlock.FACING);
+        CompoundTag oldChestTag = chest.saveWithoutMetadata(level.registryAccess());
+
+        level.removeBlockEntity(blockPos);
+        level.removeBlock(blockPos, false);
+        level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, blockPos, Block.getId(oldState));
+
+        BlockState newState = this.type.target.getBlock().defaultBlockState()
+            .setValue(ChestBlock.FACING, chestFacing)
+            .setValue(ChestBlock.WATERLOGGED, oldState.getValue(ChestBlock.WATERLOGGED));
+        level.setBlock(blockPos, newState, 3);
+        level.sendBlockUpdated(blockPos, newState, newState, 3);
+
+        BlockEntity newBlockEntity = level.getBlockEntity(blockPos);
+        if (newBlockEntity != null) {
+            ValueInput valueInput = TagValueInput.create(ProblemReporter.DISCARDING, level.registryAccess(), oldChestTag);
+            newBlockEntity.loadWithComponents(valueInput);
+            if (newBlockEntity instanceof GenericChestEntity genericChest) {
+                genericChest.clampInventoryToCapacity();
+            }
+            newBlockEntity.setChanged();
+        }
+
+        level.playSound(null, blockPos, oldState.getSoundType().getBreakSound(), SoundSource.BLOCKS, oldState.getSoundType().getVolume(), oldState.getSoundType().getPitch());
+        level.playSound(null, blockPos, newState.getSoundType().getPlaceSound(), SoundSource.BLOCKS, newState.getSoundType().getVolume(), newState.getSoundType().getPitch());
+        if (!player.getAbilities().instabuild) {
+            context.getItemInHand().shrink(1);
+        }
+        return InteractionResult.SUCCESS;
     }
 
+    private boolean canUpgrade(BlockState state) {
+        if (this.type.source == ChestTypes.WOOD) {
+            return state.is(Blocks.CHEST) || state.is(Blocks.TRAPPED_CHEST);
+        }
+        return state.is(this.type.source.getBlock());
+    }
 }

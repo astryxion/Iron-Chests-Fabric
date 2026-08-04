@@ -1,40 +1,50 @@
 package astryxion.ironchest.blocks;
 
 import astryxion.ironchest.IronChests;
-import astryxion.ironchest.registry.ModBlockEntityType;
-import astryxion.ironchest.registry.ModBlocks;
-import astryxion.ironchest.registry.ModScreenHandlerType;
+import astryxion.ironchest.blocks.blockentities.CrystalChestEntity;
+import astryxion.ironchest.blocks.blockentities.GenericChestEntity;
 import astryxion.ironchest.screenhandlers.ChestScreenHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.inventory.MenuType;
+import org.jspecify.annotations.Nullable;
 
 public enum ChestTypes {
-    NETHERITE(126, 14, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/netherite_chest")),
-    OBSIDIAN(108, 12, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/obsidian_chest")),
-    CRYSTAL(108, 12, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/crystal_chest")),
-    DIAMOND(108, 12, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/diamond_chest")),
-    EMERALD(108, 12, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/emerald_chest")),
-    GOLD(81, 9, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/gold_chest")),
-    IRON(54, 9, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/iron_chest")),
-    COPPER(45, 9, Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/copper_chest")),
-    CHRISTMAS(27, 9, Identifier.parse("minecraft:entity/chest/christmas")),
-    WOOD(27, 9, Identifier.parse("minecraft:entity/chest/normal"));
+    NETHERITE(126, 14, "netherite_chest", Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/netherite_chest")),
+    OBSIDIAN(108, 12, "obsidian_chest", Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/obsidian_chest")),
+    CRYSTAL(108, 12, "crystal_chest", Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/crystal_chest")),
+    DIAMOND(108, 12, "diamond_chest", Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/diamond_chest")),
+    EMERALD(108, 12, "emerald_chest", Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/emerald_chest")),
+    GOLD(81, 9, "gold_chest", Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/gold_chest")),
+    IRON(54, 9, "iron_chest", Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/iron_chest")),
+    COPPER(45, 9, "copper_chest", Identifier.fromNamespaceAndPath(IronChests.MOD_ID, "entity/chest/copper_chest")),
+    CHRISTMAS(27, 9, "christmas_chest", Identifier.withDefaultNamespace("entity/chest/christmas")),
+    WOOD(27, 9, null, Identifier.withDefaultNamespace("entity/chest/normal"));
+
+    public static final ChestTypes[] PLAYABLE = {
+        COPPER, IRON, GOLD, DIAMOND, EMERALD, CRYSTAL, OBSIDIAN, NETHERITE, CHRISTMAS
+    };
 
     public final int size;
     public final int rowLength;
+    public final String registryId;
     public final Identifier texture;
 
-    ChestTypes(int size, int rowLength, Identifier texture) {
+    private @Nullable Block block;
+    private @Nullable BlockEntityType<? extends ChestBlockEntity> blockEntityType;
+    private MenuType<ChestScreenHandler> menuType;
+
+    ChestTypes(int size, int rowLength, String registryId, Identifier texture) {
         this.size = size;
         this.rowLength = rowLength;
+        this.registryId = registryId;
         this.texture = texture;
     }
 
@@ -42,95 +52,67 @@ public enum ChestTypes {
         return this.size / this.rowLength;
     }
 
-    public static Block get(ChestTypes type) {
-        return switch (type) {
-            case COPPER -> ModBlocks.COPPER_CHEST;
-            case IRON -> ModBlocks.IRON_CHEST;
-            case GOLD -> ModBlocks.GOLD_CHEST;
-            case DIAMOND -> ModBlocks.DIAMOND_CHEST;
-            case EMERALD -> ModBlocks.EMERALD_CHEST;
-            case CRYSTAL -> ModBlocks.CRYSTAL_CHEST;
-            case OBSIDIAN -> ModBlocks.OBSIDIAN_CHEST;
-            case NETHERITE -> ModBlocks.NETHERITE_CHEST;
-            case CHRISTMAS -> ModBlocks.CHRISTMAS_CHEST;
-            default -> Blocks.CHEST;
-        };
+    public void bindBlock(Block block) {
+        this.block = block;
     }
 
-    // Used to implement Item Upgrades
-    public ChestBlockEntity makeEntity(BlockPos pos, BlockState state) {
-        return switch (this) {
-            case COPPER -> ModBlockEntityType.COPPER_CHEST.create(pos, state);
-            case IRON -> ModBlockEntityType.IRON_CHEST.create(pos, state);
-            case GOLD -> ModBlockEntityType.GOLD_CHEST.create(pos, state);
-            case DIAMOND -> ModBlockEntityType.DIAMOND_CHEST.create(pos, state);
-            case EMERALD -> ModBlockEntityType.EMERALD_CHEST.create(pos, state);
-            case CRYSTAL -> ModBlockEntityType.CRYSTAL_CHEST.create(pos, state);
-            case OBSIDIAN -> ModBlockEntityType.OBSIDIAN_CHEST.create(pos, state);
-            case NETHERITE -> ModBlockEntityType.NETHERITE_CHEST.create(pos, state);
-            case CHRISTMAS -> ModBlockEntityType.CHRISTMAS_CHEST.create(pos, state);
-            default -> new ChestBlockEntity(pos, state);
-        };
+    public void bindBlockEntityType(BlockEntityType<? extends ChestBlockEntity> blockEntityType) {
+        this.blockEntityType = blockEntityType;
     }
 
-    public MenuType<ChestScreenHandler> getScreenHandlerType() {
-        return switch (this) {
-            case COPPER -> ModScreenHandlerType.COPPER_CHEST;
-            case IRON -> ModScreenHandlerType.IRON_CHEST;
-            case GOLD -> ModScreenHandlerType.GOLD_CHEST;
-            case DIAMOND -> ModScreenHandlerType.DIAMOND_CHEST;
-            case EMERALD -> ModScreenHandlerType.EMERALD_CHEST;
-            case CRYSTAL -> ModScreenHandlerType.CRYSTAL_CHEST;
-            case OBSIDIAN -> ModScreenHandlerType.OBSIDIAN_CHEST;
-            case NETHERITE -> ModScreenHandlerType.NETHERITE_CHEST;
-            default -> ModScreenHandlerType.CHRISTMAS_CHEST;
-        };
+    public void bindMenuType(MenuType<ChestScreenHandler> menuType) {
+        this.menuType = menuType;
+    }
+
+    public MenuType<ChestScreenHandler> getMenuType() {
+        return this.menuType;
+    }
+
+    public Block getBlock() {
+        return this.block != null ? this.block : Blocks.CHEST;
+    }
+
+    public ChestBlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        if (this == CRYSTAL) {
+            return new CrystalChestEntity(pos, state);
+        }
+        return new GenericChestEntity(this, pos, state);
     }
 
     public BlockEntityType<? extends ChestBlockEntity> getBlockEntityType() {
-        return switch (this) {
-            case COPPER -> ModBlockEntityType.COPPER_CHEST;
-            case IRON -> ModBlockEntityType.IRON_CHEST;
-            case GOLD -> ModBlockEntityType.GOLD_CHEST;
-            case DIAMOND -> ModBlockEntityType.DIAMOND_CHEST;
-            case EMERALD -> ModBlockEntityType.EMERALD_CHEST;
-            case CRYSTAL -> ModBlockEntityType.CRYSTAL_CHEST;
-            case OBSIDIAN -> ModBlockEntityType.OBSIDIAN_CHEST;
-            case NETHERITE -> ModBlockEntityType.NETHERITE_CHEST;
-            case CHRISTMAS -> ModBlockEntityType.CHRISTMAS_CHEST;
-            default -> BlockEntityType.CHEST;
-        };
+        return this.blockEntityType != null ? this.blockEntityType : BlockEntityType.CHEST;
     }
 
-    public BlockBehaviour.Properties setting() {
+    public BlockBehaviour.Properties blockProperties() {
         return switch (this) {
             case COPPER, GOLD -> BlockBehaviour.Properties.of()
-                    .strength(3.0F, 6.0F)
-                    .sound(SoundType.COPPER)
-                    .requiresCorrectToolForDrops();
+                .strength(3.0F, 6.0F)
+                .sound(SoundType.COPPER)
+                .requiresCorrectToolForDrops();
             case IRON -> BlockBehaviour.Properties.of()
-                    .strength(5.0F, 6.0F)
-                    .sound(SoundType.IRON)
-                    .requiresCorrectToolForDrops();
+                .strength(5.0F, 6.0F)
+                .sound(SoundType.METAL)
+                .requiresCorrectToolForDrops();
             case DIAMOND, EMERALD -> BlockBehaviour.Properties.of()
-                    .strength(5.0F, 6.0F)
-                    .sound(SoundType.STONE)
-                    .requiresCorrectToolForDrops();
+                .strength(5.0F, 6.0F)
+                .sound(SoundType.STONE)
+                .requiresCorrectToolForDrops();
             case CRYSTAL -> BlockBehaviour.Properties.of()
-                    .strength(3.0F, 3.0F)
-                    .sound(SoundType.AMETHYST)
-                    .requiresCorrectToolForDrops();
+                .strength(3.0F, 3.0F)
+                .sound(SoundType.AMETHYST)
+                .noOcclusion()
+                .requiresCorrectToolForDrops();
             case OBSIDIAN -> BlockBehaviour.Properties.of()
-                    .strength(50.0F, 1200.0F)
-                    .sound(SoundType.STONE)
-                    .requiresCorrectToolForDrops();
+                .strength(50.0F, 1200.0F)
+                .sound(SoundType.STONE)
+                .requiresCorrectToolForDrops();
             case NETHERITE -> BlockBehaviour.Properties.of()
-                    .strength(50.0F, 1200.0F)
-                    .sound(SoundType.NETHERITE_BLOCK)
-                    .requiresCorrectToolForDrops();
+                .strength(50.0F, 1200.0F)
+                .sound(SoundType.NETHERITE_BLOCK)
+                .requiresCorrectToolForDrops();
             case WOOD, CHRISTMAS -> BlockBehaviour.Properties.of()
-                    .strength(3.0F, 3.0F)
-                    .sound(SoundType.WOOD);
+                .strength(3.0F, 3.0F)
+                .sound(SoundType.WOOD);
             default -> BlockBehaviour.Properties.of();
         };
     }

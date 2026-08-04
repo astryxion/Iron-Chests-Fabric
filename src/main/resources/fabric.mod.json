@@ -2,16 +2,20 @@
   "schemaVersion": 1,
   "id": "ironchest",
   "version": "${version}",
-  "name": "Iron Chests",
-  "description": "Bigger Chests for Minecraft",
+  "name": "Iron Chests (Refabricated)",
+  "description": "Bigger and upgradable chests mod for the Fabric loader.",
   "authors": [
-    "astryxion"
+    "Astryxion"
+  ],
+  "contributors": [
+    "cyberanner"
   ],
   "contact": {
-    "homepage": "https://github.com/astryxion/ironchests",
-    "sources": "https://github.com/astryxion/ironchests"
+    "homepage": "https://github.com/astryxion/Iron-Chests-Fabric",
+    "sources": "https://github.com/astryxion/Iron-Chests-Fabric",
+    "issues": "https://github.com/astryxion/Iron-Chests-Fabric/issues"
   },
-  "license": "gpl-3.0",
+  "license": "GPL-3.0-only",
   "icon": "assets/ironchest/icon.png",
   "environment": "*",
   "entrypoints": {
@@ -26,10 +30,9 @@
     "ironchest.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.18.5",
-    "fabric-api": "*",
-    "minecraft": "~26.1",
+    "fabricloader": ">=0.19.3",
+    "minecraft": ">=26.1",
     "java": ">=25",
-    "libgui": "*"
+    "fabric-api": "*"
   }
 }

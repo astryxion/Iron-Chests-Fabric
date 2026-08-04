@@ -1,18 +1,20 @@
 package astryxion.ironchest.registry;
 
+import astryxion.ironchest.blocks.ChestTypes;
 import astryxion.ironchest.client.ChestEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
 
 public class ModBlockEntityRenderer {
     public static void registerBlockEntityRenderer() {
-        BlockEntityRenderers.register(ModBlockEntityType.COPPER_CHEST, ChestEntityRenderer::new);
-        BlockEntityRenderers.register(ModBlockEntityType.IRON_CHEST, ChestEntityRenderer::new);
-        BlockEntityRenderers.register(ModBlockEntityType.GOLD_CHEST, ChestEntityRenderer::new);
-        BlockEntityRenderers.register(ModBlockEntityType.DIAMOND_CHEST, ChestEntityRenderer::new);
-        BlockEntityRenderers.register(ModBlockEntityType.EMERALD_CHEST, ChestEntityRenderer::new);
-        BlockEntityRenderers.register(ModBlockEntityType.CRYSTAL_CHEST, ChestEntityRenderer::new);
-        BlockEntityRenderers.register(ModBlockEntityType.OBSIDIAN_CHEST, ChestEntityRenderer::new);
-        BlockEntityRenderers.register(ModBlockEntityType.NETHERITE_CHEST, ChestEntityRenderer::new);
-        BlockEntityRenderers.register(ModBlockEntityType.CHRISTMAS_CHEST, ChestEntityRenderer::new);
+        for (ChestTypes type : ChestTypes.PLAYABLE) {
+            register(type.getBlockEntityType());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T extends ChestBlockEntity> void register(BlockEntityType<? extends ChestBlockEntity> blockEntityType) {
+        BlockEntityRenderers.register((BlockEntityType<T>) blockEntityType, ChestEntityRenderer::new);
     }
 }
